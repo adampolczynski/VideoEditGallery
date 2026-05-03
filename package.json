@@ -11,6 +11,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "start": "node server/server.js",
+    "optimize:videos": "node scripts/optimize-videos.js",
     "verify": "npm run build"
   },
   "keywords": ["video", "portfolio", "admin"],
