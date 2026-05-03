@@ -6,6 +6,7 @@ export const VideoSlider = ({ beforeUrl, afterUrl, title, autoScroll = false, au
   const containerRef = useRef(null);
   const autoScrollRef = useRef(null);
   const directionRef = useRef(1);
+  const isPointerDownRef = useRef(false);
 
   const effectiveAutoScroll = autoScroll && !isInteracting;
   const videoFitClass = fitMode === 'cover' ? 'object-cover' : 'object-contain';
@@ -49,36 +50,35 @@ export const VideoSlider = ({ beforeUrl, afterUrl, title, autoScroll = false, au
     setSliderPosition(Math.max(0, Math.min(100, percentage)));
   };
 
-  const handleMouseMove = (e) => {
-    if (effectiveAutoScroll) return;
+  const handlePointerDown = (e) => {
+    isPointerDownRef.current = true;
+    setIsInteracting(true);
+    e.currentTarget.setPointerCapture?.(e.pointerId);
     updateSliderPosition(e.clientX);
   };
 
-  const handleTouchStart = (e) => {
-    setIsInteracting(true);
-    updateSliderPosition(e.touches[0].clientX);
-  };
-
-  const handleTouchMove = (e) => {
-    if (effectiveAutoScroll || !containerRef.current) return;
-    updateSliderPosition(e.touches[0].clientX);
-  };
-
-  const handleClick = (e) => {
-    setIsInteracting(true);
+  const handlePointerMove = (e) => {
+    if (e.pointerType === 'touch' && !isPointerDownRef.current) return;
+    if (autoScroll && !isInteracting && !isPointerDownRef.current) return;
+    e.preventDefault();
     updateSliderPosition(e.clientX);
+  };
+
+  const handlePointerUp = (e) => {
+    isPointerDownRef.current = false;
+    e.currentTarget.releasePointerCapture?.(e.pointerId);
   };
 
   return (
     <div
       ref={containerRef}
-      className="relative w-full h-72 rounded-lg overflow-hidden group cursor-col-resize surface-panel bg-black"
+      className="relative w-full h-72 rounded-lg overflow-hidden group cursor-col-resize touch-none select-none surface-panel bg-black"
       onMouseEnter={() => setIsInteracting(true)}
       onMouseLeave={() => setIsInteracting(false)}
-      onMouseMove={handleMouseMove}
-      onClick={handleClick}
-      onTouchStart={handleTouchStart}
-      onTouchMove={handleTouchMove}
+      onPointerDown={handlePointerDown}
+      onPointerMove={handlePointerMove}
+      onPointerUp={handlePointerUp}
+      onPointerCancel={handlePointerUp}
     >
       {/* Before video */}
       <video
@@ -113,10 +113,9 @@ export const VideoSlider = ({ beforeUrl, afterUrl, title, autoScroll = false, au
         style={{ left: `clamp(24px, ${sliderPosition}%, calc(100% - 24px))` }}
       >
         <div className="flex h-12 w-12 items-center justify-center rounded-full border-2 border-black bg-white text-black shadow-neon ring-2 ring-white/80">
-          <div className="flex items-center justify-center gap-2" aria-hidden="true">
-            <span className="block h-0 w-0 border-y-[8px] border-r-[11px] border-y-transparent border-r-black" />
-            <span className="block h-0 w-0 border-y-[8px] border-l-[11px] border-y-transparent border-l-black" />
-          </div>
+          <span className="block font-black leading-none text-[26px] tracking-normal text-black" aria-hidden="true">
+            &lt;&gt;
+          </span>
         </div>
       </div>
 
