@@ -94,7 +94,7 @@ export const Home = () => {
 
         {/* Videos grid */}
         <section className="pt-4 pb-12 px-4 sm:px-6 lg:px-8">
-          <div className="max-w-7xl mx-auto">
+          <div className="max-w-screen-2xl mx-auto">
             {loading ? (
               <div className="flex items-center justify-center py-20">
                 <div className="animate-pulse">
