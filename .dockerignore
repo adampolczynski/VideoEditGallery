@@ -1,0 +1,9 @@
+node_modules
+dist
+data/*.json
+uploads/*
+logs
+.git
+.env
+.env.production
+npm-debug.log*

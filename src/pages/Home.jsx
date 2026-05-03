@@ -1,0 +1,121 @@
+import React, { useEffect } from 'react';
+import { Lock } from 'lucide-react';
+import VideoGrid from '../components/VideoGrid';
+import { videosAPI, settingsAPI } from '../api';
+import { useVideosStore, useAuthStore } from '../store';
+import { useTranslation } from '../i18n';
+
+export const Home = () => {
+  const { videos, settings, loading, error, setVideos, setSettings, setLoading, setError } = useVideosStore();
+  const { isAuthenticated } = useAuthStore();
+  const { t } = useTranslation();
+
+  useEffect(() => {
+    fetchVideos();
+    fetchSettings();
+  }, []);
+
+  const fetchVideos = async () => {
+    setLoading(true);
+    try {
+      const response = await videosAPI.getAll();
+      setVideos(response.data);
+    } catch (error) {
+      console.error('Failed to fetch videos:', error);
+      setError(t('videoLoadFailed'));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchSettings = async () => {
+    try {
+      const response = await settingsAPI.getAll();
+      if (response.data) {
+        setSettings(response.data);
+      }
+    } catch (error) {
+      console.error('Failed to fetch settings:', error);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-darker carbon-bg relative">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.12),transparent_32rem)] pointer-events-none" />
+
+      {/* Content */}
+      <div className="relative z-10">
+        {/* Navigation bar */}
+        <nav className="border-b border-white/10 bg-black/70 backdrop-blur-xl sticky top-0 z-50">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-lg bg-white text-black flex items-center justify-center shadow-soft">
+                <span className="font-black">VP</span>
+              </div>
+              <h1 className="text-xl sm:text-2xl font-bold tracking-normal text-white">Video Portfolio</h1>
+            </div>
+
+            <div className="flex items-center gap-4">
+              {isAuthenticated && (
+                <a
+                  href="/admin"
+                  className="px-4 py-2 bg-white text-black font-semibold rounded-lg hover:bg-accent transition-colors"
+                >
+                  {t('adminPanel')}
+                </a>
+              )}
+              {!isAuthenticated && (
+                <a
+                  href="/admin"
+                  className="flex items-center gap-2 px-4 py-2 border border-white/15 text-white rounded-lg hover:bg-white/10 transition-colors"
+                >
+                  <Lock size={16} />
+                  {t('admin')}
+                </a>
+              )}
+            </div>
+          </div>
+        </nav>
+
+        {/* Hero section */}
+        <section className="py-16 px-4 sm:px-6 lg:px-8">
+          <div className="max-w-7xl mx-auto text-center mb-12">
+            <h2 className="text-5xl sm:text-7xl font-black mb-5 text-white">
+              {t('transformations')}
+            </h2>
+            <p className="text-xl text-gray-300 max-w-2xl mx-auto">
+              {t('videosIntro')}
+            </p>
+          </div>
+        </section>
+
+        {/* Videos grid */}
+        <section className="py-12 px-4 sm:px-6 lg:px-8">
+          <div className="max-w-7xl mx-auto">
+            {loading ? (
+              <div className="flex items-center justify-center py-20">
+                <div className="animate-pulse">
+                  <div className="mx-auto mb-4 h-10 w-10 rounded-full border border-white/20 border-t-accent" />
+                  <p className="text-gray-300">{t('loadingVideos')}</p>
+                </div>
+              </div>
+            ) : error ? (
+              <div className="text-center py-20">
+                <p className="text-danger text-lg">{error}</p>
+              </div>
+            ) : (
+              <VideoGrid
+                videos={videos}
+                autoScroll={settings.autoScroll}
+                autoScrollInterval={settings.autoScrollInterval}
+                t={t}
+              />
+            )}
+          </div>
+        </section>
+      </div>
+    </div>
+  );
+};
+
+export default Home;
