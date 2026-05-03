@@ -108,11 +108,13 @@ export const VideoSlider = ({ beforeUrl, afterUrl, title, autoScroll = false, au
       <div
         className="absolute top-0 bottom-0 w-1 bg-white group-hover:w-2 transition-all"
         style={{ left: `${sliderPosition}%`, transform: 'translateX(-50%)' }}
+      />
+      <div
+        className="absolute top-1/2 z-10 -translate-x-1/2 -translate-y-1/2"
+        style={{ left: `clamp(24px, ${sliderPosition}%, calc(100% - 24px))` }}
       >
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-          <div className="flex h-11 w-11 items-center justify-center rounded-full border-2 border-black bg-white text-black shadow-neon ring-2 ring-white/70">
-            <ChevronsLeftRight size={24} strokeWidth={2.8} aria-hidden="true" />
-          </div>
+        <div className="flex h-12 w-12 items-center justify-center rounded-full border-2 border-black bg-white text-black shadow-neon ring-2 ring-white/80">
+          <ChevronsLeftRight size={26} strokeWidth={3} aria-hidden="true" />
         </div>
       </div>
 
