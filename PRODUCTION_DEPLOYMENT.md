@@ -85,10 +85,11 @@ docker cp ./backup-uploads video-portfolio:/app/
    sudo apt-get install -y nodejs nginx
    ```
 
-4. **Setup application directory**
+4. **Create app user and setup application directory**
    ```bash
+   sudo useradd -m -s /bin/bash videoapp || true
    sudo mkdir -p /home/video-portfolio
-   sudo chown $USER:$USER /home/video-portfolio
+   sudo chown -R videoapp:videoapp /home/video-portfolio
    cd /home/video-portfolio
    ```
 
@@ -103,12 +104,14 @@ docker cp ./backup-uploads video-portfolio:/app/
    cd /home/video-portfolio
    cp .env.example .env
    nano .env  # Edit with strong passwords
+   sudo chown videoapp:videoapp .env
    ```
 
 7. **Install and build**
    ```bash
-   npm install --production
-   npm run build
+   sudo -u videoapp npm ci
+   sudo -u videoapp npm run build
+   sudo -u videoapp npm prune --omit=dev
    ```
 
 8. **Create systemd service**
@@ -120,12 +123,14 @@ docker cp ./backup-uploads video-portfolio:/app/
 
    [Service]
    Type=simple
-   User=$USER
+   User=videoapp
    WorkingDirectory=/home/video-portfolio
    ExecStart=/usr/bin/node server/server.js
    Restart=always
+   RestartSec=10
    Environment="NODE_ENV=production"
    Environment="PORT=5000"
+   EnvironmentFile=-/home/video-portfolio/.env
 
    [Install]
    WantedBy=multi-user.target
@@ -133,6 +138,7 @@ docker cp ./backup-uploads video-portfolio:/app/
 
    sudo systemctl daemon-reload
    sudo systemctl enable video-portfolio
+   sudo systemctl reset-failed video-portfolio
    sudo systemctl start video-portfolio
    ```
 
@@ -180,6 +186,30 @@ sudo systemctl stop video-portfolio
 
 # Start
 sudo systemctl start video-portfolio
+```
+
+### Admin password troubleshooting
+
+The server reads `ADMIN_PASSWORD` from `/home/video-portfolio/.env` through the systemd `EnvironmentFile` setting. If login says "Invalid password" even after editing `.env`, verify what the running service sees:
+
+```bash
+sudo systemctl cat video-portfolio
+sudo systemctl show video-portfolio -p Environment -p EnvironmentFiles
+sudo tr '\0' '\n' < /proc/$(systemctl show -p MainPID --value video-portfolio)/environ | grep ADMIN_PASSWORD
+```
+
+After changing `/home/video-portfolio/.env`, restart the service:
+
+```bash
+sudo chown videoapp:videoapp /home/video-portfolio/.env
+sudo systemctl restart video-portfolio
+```
+
+Use dotenv-safe formatting. Avoid spaces around `=`, and quote values that contain `#`, spaces, or shell-like punctuation:
+
+```env
+ADMIN_PASSWORD="your exact password here"
+JWT_SECRET="your long random secret here"
 ```
 
 ---

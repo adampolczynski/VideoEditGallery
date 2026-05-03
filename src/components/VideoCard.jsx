@@ -48,9 +48,6 @@ export const VideoCard = ({
       {/* Info */}
       <div className="mt-4 p-3 surface-panel">
         <h3 className="text-lg font-bold text-white truncate">{video.title}</h3>
-        {video.description && (
-          <p className="text-sm text-gray-400 line-clamp-2 mt-1">{video.description}</p>
-        )}
       </div>
     </div>
   );

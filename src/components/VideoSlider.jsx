@@ -73,13 +73,12 @@ export const VideoSlider = ({ beforeUrl, afterUrl, title, autoScroll = false, au
 
       {/* After video (clipped) */}
       <div
-        className="absolute inset-0 overflow-hidden"
-        style={{ width: `${sliderPosition}%` }}
+        className="absolute inset-0"
+        style={{ clipPath: `inset(0 ${100 - sliderPosition}% 0 0)` }}
       >
         <video
           src={afterUrl}
           className="absolute inset-0 w-full h-full object-cover"
-          style={{ width: `${100 / (sliderPosition / 100)}%` }}
           autoPlay
           muted
           loop

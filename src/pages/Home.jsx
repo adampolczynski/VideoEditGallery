@@ -1,13 +1,11 @@
 import React, { useEffect } from 'react';
-import { Lock } from 'lucide-react';
 import VideoGrid from '../components/VideoGrid';
 import { videosAPI, settingsAPI } from '../api';
-import { useVideosStore, useAuthStore } from '../store';
+import { useVideosStore } from '../store';
 import { useTranslation } from '../i18n';
 
 export const Home = () => {
   const { videos, settings, loading, error, setVideos, setSettings, setLoading, setError } = useVideosStore();
-  const { isAuthenticated } = useAuthStore();
   const { t } = useTranslation();
 
   useEffect(() => {
@@ -52,27 +50,7 @@ export const Home = () => {
               <div className="w-10 h-10 rounded-lg bg-white text-black flex items-center justify-center shadow-soft">
                 <span className="font-black">VP</span>
               </div>
-              <h1 className="text-xl sm:text-2xl font-bold tracking-normal text-white">Video Portfolio</h1>
-            </div>
-
-            <div className="flex items-center gap-4">
-              {isAuthenticated && (
-                <a
-                  href="/admin"
-                  className="px-4 py-2 bg-white text-black font-semibold rounded-lg hover:bg-accent transition-colors"
-                >
-                  {t('adminPanel')}
-                </a>
-              )}
-              {!isAuthenticated && (
-                <a
-                  href="/admin"
-                  className="flex items-center gap-2 px-4 py-2 border border-white/15 text-white rounded-lg hover:bg-white/10 transition-colors"
-                >
-                  <Lock size={16} />
-                  {t('admin')}
-                </a>
-              )}
+              <h1 className="text-xl sm:text-2xl font-bold tracking-normal text-white">{t('brandTitle')}</h1>
             </div>
           </div>
         </nav>
@@ -85,6 +63,9 @@ export const Home = () => {
             </h2>
             <p className="text-xl text-gray-300 max-w-2xl mx-auto">
               {t('videosIntro')}
+            </p>
+            <p className="mt-5 text-base text-gray-400 max-w-3xl mx-auto">
+              {t('contactIntro')}
             </p>
           </div>
         </section>

@@ -102,8 +102,9 @@ docker-compose up -d --build
 
 # Manual
 git pull origin main
-npm install --production
+npm ci
 npm run build
+npm prune --omit=dev
 sudo systemctl restart video-portfolio
 ```
 

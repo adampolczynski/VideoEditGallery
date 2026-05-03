@@ -19,8 +19,9 @@ Complete this before deploying to production.
 
 - [ ] Docker is installed (if using Docker)
 - [ ] Node.js 18+ installed (if using manual setup)
-- [ ] `npm install --production` run successfully
+- [ ] `npm ci` run successfully before build
 - [ ] `npm run build` completes without errors
+- [ ] `npm prune --omit=dev` run successfully after build
 - [ ] `dist/` folder contains frontend assets
 - [ ] `data/` directory is writable
 - [ ] `uploads/` directory is writable and backed up
