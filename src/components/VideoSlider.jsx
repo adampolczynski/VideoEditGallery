@@ -1,5 +1,4 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { ChevronsLeftRight } from 'lucide-react';
 
 export const VideoSlider = ({ beforeUrl, afterUrl, title, autoScroll = false, autoScrollInterval = 5000, fitMode = 'contain', t = (key) => key }) => {
   const [sliderPosition, setSliderPosition] = useState(50);
@@ -114,7 +113,10 @@ export const VideoSlider = ({ beforeUrl, afterUrl, title, autoScroll = false, au
         style={{ left: `clamp(24px, ${sliderPosition}%, calc(100% - 24px))` }}
       >
         <div className="flex h-12 w-12 items-center justify-center rounded-full border-2 border-black bg-white text-black shadow-neon ring-2 ring-white/80">
-          <ChevronsLeftRight size={26} strokeWidth={3} aria-hidden="true" />
+          <div className="flex items-center justify-center gap-2" aria-hidden="true">
+            <span className="block h-0 w-0 border-y-[8px] border-r-[11px] border-y-transparent border-r-black" />
+            <span className="block h-0 w-0 border-y-[8px] border-l-[11px] border-y-transparent border-l-black" />
+          </div>
         </div>
       </div>
 
