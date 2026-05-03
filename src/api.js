@@ -1,10 +1,13 @@
 import axios from 'axios';
 import { useAuthStore } from './store.js';
 
-const API_URL = import.meta.env.VITE_API_URL || window.location.origin;
+const configuredApiUrl = import.meta.env.VITE_API_URL;
+const API_URL = configuredApiUrl && !configuredApiUrl.includes('your-domain.com')
+  ? configuredApiUrl
+  : window.location.origin;
 
 const api = axios.create({
-  baseURL: `${API_URL}/api`,
+  baseURL: `${API_URL.replace(/\/$/, '')}/api`,
 });
 
 // Add token to requests

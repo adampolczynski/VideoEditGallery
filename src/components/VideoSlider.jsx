@@ -7,21 +7,28 @@ export const VideoSlider = ({ beforeUrl, afterUrl, title, autoScroll = false, au
   const autoScrollRef = useRef(null);
   const directionRef = useRef(1);
   const isPointerDownRef = useRef(false);
+  const lastFrameTimeRef = useRef(null);
 
   const effectiveAutoScroll = autoScroll && !isInteracting;
   const videoFitClass = fitMode === 'cover' ? 'object-cover' : 'object-contain';
 
   useEffect(() => {
     if (autoScrollRef.current) {
-      clearInterval(autoScrollRef.current);
+      cancelAnimationFrame(autoScrollRef.current);
       autoScrollRef.current = null;
     }
 
     if (!effectiveAutoScroll) return;
 
-    autoScrollRef.current = setInterval(() => {
+    lastFrameTimeRef.current = null;
+
+    const animate = (time) => {
+      const lastTime = lastFrameTimeRef.current ?? time;
+      const delta = time - lastTime;
+      lastFrameTimeRef.current = time;
+
       setSliderPosition((currentPosition) => {
-        let nextPosition = currentPosition + directionRef.current * (100 / (autoScrollInterval / 100));
+        let nextPosition = currentPosition + directionRef.current * (delta * 100 / autoScrollInterval);
 
         if (nextPosition >= 100 || nextPosition <= 0) {
           directionRef.current *= -1;
@@ -30,11 +37,15 @@ export const VideoSlider = ({ beforeUrl, afterUrl, title, autoScroll = false, au
 
         return nextPosition;
       });
-    }, 100);
+
+      autoScrollRef.current = requestAnimationFrame(animate);
+    };
+
+    autoScrollRef.current = requestAnimationFrame(animate);
 
     return () => {
       if (autoScrollRef.current) {
-        clearInterval(autoScrollRef.current);
+        cancelAnimationFrame(autoScrollRef.current);
         autoScrollRef.current = null;
       }
     };
@@ -105,15 +116,12 @@ export const VideoSlider = ({ beforeUrl, afterUrl, title, autoScroll = false, au
 
       {/* Slider handle */}
       <div
-        className="absolute top-0 bottom-0 w-1 bg-white group-hover:w-2 transition-all"
+        className="absolute inset-y-0 z-10"
         style={{ left: `${sliderPosition}%`, transform: 'translateX(-50%)' }}
-      />
-      <div
-        className="absolute top-1/2 z-10 -translate-x-1/2 -translate-y-1/2"
-        style={{ left: `clamp(24px, ${sliderPosition}%, calc(100% - 24px))` }}
       >
-        <div className="flex h-12 w-12 items-center justify-center rounded-full border-2 border-black bg-white text-black shadow-neon ring-2 ring-white/80">
-          <span className="block font-black leading-none text-[26px] tracking-normal text-black" aria-hidden="true">
+        <div className="absolute inset-y-0 left-1/2 w-0.5 -translate-x-1/2 bg-white group-hover:w-1" />
+        <div className="absolute left-1/2 top-1/2 flex h-8 w-8 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-black bg-white text-black shadow-soft ring-1 ring-white/80">
+          <span className="block font-black leading-none text-[16px] tracking-normal text-black" aria-hidden="true">
             &lt;&gt;
           </span>
         </div>
