@@ -1,71 +1,89 @@
 import React, { useState, useRef, useEffect } from 'react';
 
-export const VideoSlider = ({ beforeUrl, afterUrl, title, autoScroll = false, autoScrollInterval = 5000, t = (key) => key }) => {
+export const VideoSlider = ({ beforeUrl, afterUrl, title, autoScroll = false, autoScrollInterval = 5000, fitMode = 'contain', t = (key) => key }) => {
   const [sliderPosition, setSliderPosition] = useState(50);
+  const [isInteracting, setIsInteracting] = useState(false);
   const containerRef = useRef(null);
   const autoScrollRef = useRef(null);
+  const directionRef = useRef(1);
+
+  const effectiveAutoScroll = autoScroll && !isInteracting;
+  const videoFitClass = fitMode === 'cover' ? 'object-cover' : 'object-contain';
 
   useEffect(() => {
-    if (!autoScroll) return;
+    if (autoScrollRef.current) {
+      clearInterval(autoScrollRef.current);
+      autoScrollRef.current = null;
+    }
 
-    const startAutoScroll = () => {
-      let direction = 1;
-      let position = 50;
+    if (!effectiveAutoScroll) return;
 
-      const interval = setInterval(() => {
-        position += direction * (100 / (autoScrollInterval / 100));
-        
-        if (position >= 100 || position <= 0) {
-          direction *= -1;
-          position = Math.max(0, Math.min(100, position));
+    autoScrollRef.current = setInterval(() => {
+      setSliderPosition((currentPosition) => {
+        let nextPosition = currentPosition + directionRef.current * (100 / (autoScrollInterval / 100));
+
+        if (nextPosition >= 100 || nextPosition <= 0) {
+          directionRef.current *= -1;
+          nextPosition = Math.max(0, Math.min(100, nextPosition));
         }
 
-        setSliderPosition(position);
-      }, 100);
-
-      autoScrollRef.current = interval;
-    };
-
-    startAutoScroll();
+        return nextPosition;
+      });
+    }, 100);
 
     return () => {
       if (autoScrollRef.current) {
         clearInterval(autoScrollRef.current);
+        autoScrollRef.current = null;
       }
     };
-  }, [autoScroll, autoScrollInterval]);
+  }, [effectiveAutoScroll, autoScrollInterval]);
 
-  const handleMouseMove = (e) => {
-    if (!containerRef.current || autoScroll) return;
+  const updateSliderPosition = (clientX) => {
+    if (!containerRef.current) return;
 
     const rect = containerRef.current.getBoundingClientRect();
-    const x = e.clientX - rect.left;
+    const x = clientX - rect.left;
     const percentage = (x / rect.width) * 100;
 
     setSliderPosition(Math.max(0, Math.min(100, percentage)));
   };
 
+  const handleMouseMove = (e) => {
+    if (effectiveAutoScroll) return;
+    updateSliderPosition(e.clientX);
+  };
+
+  const handleTouchStart = (e) => {
+    setIsInteracting(true);
+    updateSliderPosition(e.touches[0].clientX);
+  };
+
   const handleTouchMove = (e) => {
-    if (!containerRef.current || autoScroll) return;
+    if (effectiveAutoScroll || !containerRef.current) return;
+    updateSliderPosition(e.touches[0].clientX);
+  };
 
-    const rect = containerRef.current.getBoundingClientRect();
-    const x = e.touches[0].clientX - rect.left;
-    const percentage = (x / rect.width) * 100;
-
-    setSliderPosition(Math.max(0, Math.min(100, percentage)));
+  const handleClick = (e) => {
+    setIsInteracting(true);
+    updateSliderPosition(e.clientX);
   };
 
   return (
     <div
       ref={containerRef}
-      className="relative w-full h-72 rounded-lg overflow-hidden group cursor-col-resize surface-panel"
+      className="relative w-full h-72 rounded-lg overflow-hidden group cursor-col-resize surface-panel bg-black"
+      onMouseEnter={() => setIsInteracting(true)}
+      onMouseLeave={() => setIsInteracting(false)}
       onMouseMove={handleMouseMove}
+      onClick={handleClick}
+      onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
     >
       {/* Before video */}
       <video
         src={beforeUrl}
-        className="absolute inset-0 w-full h-full object-cover"
+        className={`absolute inset-0 w-full h-full ${videoFitClass}`}
         autoPlay
         muted
         loop
@@ -78,7 +96,7 @@ export const VideoSlider = ({ beforeUrl, afterUrl, title, autoScroll = false, au
       >
         <video
           src={afterUrl}
-          className="absolute inset-0 w-full h-full object-cover"
+          className={`absolute inset-0 w-full h-full ${videoFitClass}`}
           autoPlay
           muted
           loop

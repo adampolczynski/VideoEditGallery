@@ -63,6 +63,12 @@ html {
   @apply rounded-lg border border-white/10 bg-white/[0.055] shadow-neon backdrop-blur-xl;
 }
 
+@media (min-width: 1024px) {
+  .responsive-video-grid {
+    grid-template-columns: repeat(var(--desktop-columns), minmax(0, 1fr));
+  }
+}
+
 /* Smooth transitions */
 .transition-glow {
   @apply transition-all duration-300;

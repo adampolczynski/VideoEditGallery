@@ -5,8 +5,10 @@ export const VideoGrid = ({
   videos = [], 
   autoScroll = false, 
   autoScrollInterval = 5000,
+  columns = 3,
   onEditVideo = null,
   onDeleteVideo = null,
+  onMoveVideo = null,
   isAdmin = false,
   t = (key) => key,
 }) => {
@@ -21,9 +23,14 @@ export const VideoGrid = ({
     );
   }
 
+  const desktopColumns = Math.min(5, Math.max(2, Number(columns) || 3));
+
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-      {videos.map((video) => (
+    <div
+      className="responsive-video-grid grid grid-cols-1 md:grid-cols-2 gap-8"
+      style={{ '--desktop-columns': desktopColumns }}
+    >
+      {videos.map((video, index) => (
         <VideoCard
           key={video.id}
           video={video}
@@ -31,6 +38,9 @@ export const VideoGrid = ({
           autoScrollInterval={autoScrollInterval}
           onEdit={onEditVideo}
           onDelete={onDeleteVideo}
+          onMove={onMoveVideo}
+          canMoveUp={index > 0}
+          canMoveDown={index < videos.length - 1}
           isAdmin={isAdmin}
           t={t}
         />

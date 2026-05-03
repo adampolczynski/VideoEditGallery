@@ -15,6 +15,11 @@ if (!fs.existsSync(dataDir)) {
 
 const videosFile = path.join(dataDir, 'videos.json');
 const settingsFile = path.join(dataDir, 'settings.json');
+const defaultSettings = {
+  autoScroll: false,
+  autoScrollInterval: 5000,
+  galleryColumns: 3
+};
 
 // Initialize files if they don't exist
 const initializeFiles = () => {
@@ -22,10 +27,7 @@ const initializeFiles = () => {
     fs.writeFileSync(videosFile, JSON.stringify([], null, 2));
   }
   if (!fs.existsSync(settingsFile)) {
-    fs.writeFileSync(settingsFile, JSON.stringify({
-      autoScroll: false,
-      autoScrollInterval: 5000
-    }, null, 2));
+    fs.writeFileSync(settingsFile, JSON.stringify(defaultSettings, null, 2));
   }
 };
 
@@ -91,7 +93,10 @@ export const videos = {
 export const settings = {
   getAll: () => {
     const data = fs.readFileSync(settingsFile, 'utf-8');
-    return JSON.parse(data);
+    return {
+      ...defaultSettings,
+      ...JSON.parse(data)
+    };
   },
 
   update: (key, value) => {

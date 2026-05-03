@@ -32,7 +32,7 @@ router.get('/:id', (req, res) => {
 // Create video (admin only)
 router.post('/', verifyAdmin, (req, res) => {
   try {
-    const { title, description, before_video, after_video } = req.body;
+    const { title, description, before_video, after_video, auto_scroll_mode, fit_mode } = req.body;
 
     if (!title || !before_video || !after_video) {
       return res.status(400).json({ error: 'Missing required fields' });
@@ -42,7 +42,9 @@ router.post('/', verifyAdmin, (req, res) => {
       title,
       description: description || '',
       before_video,
-      after_video
+      after_video,
+      auto_scroll_mode: auto_scroll_mode || 'global',
+      fit_mode: fit_mode || 'contain'
     });
 
     res.status(201).json(newVideo);
@@ -54,13 +56,15 @@ router.post('/', verifyAdmin, (req, res) => {
 // Update video (admin only)
 router.put('/:id', verifyAdmin, (req, res) => {
   try {
-    const { title, description, before_video, after_video, order_index } = req.body;
+    const { title, description, before_video, after_video, auto_scroll_mode, fit_mode, order_index } = req.body;
 
     const updates = {};
     if (title !== undefined) updates.title = title;
     if (description !== undefined) updates.description = description;
     if (before_video !== undefined) updates.before_video = before_video;
     if (after_video !== undefined) updates.after_video = after_video;
+    if (auto_scroll_mode !== undefined) updates.auto_scroll_mode = auto_scroll_mode;
+    if (fit_mode !== undefined) updates.fit_mode = fit_mode;
     if (order_index !== undefined) updates.order_index = order_index;
 
     const updated = videos.update(req.params.id, updates);

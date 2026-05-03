@@ -8,7 +8,7 @@ import { useTranslation } from '../i18n';
 
 export const Admin = () => {
   const { isAuthenticated, setToken, logout } = useAuthStore();
-  const { videos, settings, setVideos, setSettings, addVideo, updateVideo, removeVideo } = useVideosStore();
+  const { videos, settings, setVideos, setSettings, addVideo, updateVideo, removeVideo, reorderVideos } = useVideosStore();
   const { t } = useTranslation();
   
   const [password, setPassword] = useState('');
@@ -107,6 +107,31 @@ export const Admin = () => {
       setSettings({ [key]: value });
     } catch (error) {
       setError(t('updateFailed'));
+    }
+  };
+
+  const handleMoveVideo = async (id, direction) => {
+    const currentIndex = videos.findIndex((video) => video.id === id);
+    const nextIndex = currentIndex + direction;
+
+    if (currentIndex < 0 || nextIndex < 0 || nextIndex >= videos.length) return;
+
+    const reordered = [...videos];
+    const [movedVideo] = reordered.splice(currentIndex, 1);
+    reordered.splice(nextIndex, 0, movedVideo);
+
+    const withOrder = reordered.map((video, index) => ({
+      ...video,
+      order_index: index + 1,
+    }));
+
+    reorderVideos(withOrder);
+
+    try {
+      await videosAPI.reorder(withOrder.map(({ id }) => ({ id })));
+    } catch (error) {
+      setError(t('reorderFailed'));
+      await fetchVideos();
     }
   };
 
@@ -216,6 +241,23 @@ export const Admin = () => {
                   <p className="text-xs text-gray-400 mt-1">{t('minimumInterval')}</p>
                 </div>
               )}
+
+              <div>
+                <label className="block text-sm font-semibold text-accent mb-2">
+                  {t('galleryColumns')}
+                </label>
+                <select
+                  value={settings.galleryColumns || 3}
+                  onChange={(e) => handleSettingChange('galleryColumns', parseInt(e.target.value))}
+                  className="w-full px-4 py-2 bg-black border border-white/15 rounded-lg text-white focus:border-accent focus:outline-none"
+                >
+                  <option value="2">2</option>
+                  <option value="3">3</option>
+                  <option value="4">4</option>
+                  <option value="5">5</option>
+                </select>
+                <p className="text-xs text-gray-400 mt-1">{t('galleryColumnsHelp')}</p>
+              </div>
             </div>
           </div>
         </section>
@@ -247,11 +289,13 @@ export const Admin = () => {
               videos={videos}
               autoScroll={settings.autoScroll}
               autoScrollInterval={settings.autoScrollInterval}
+              columns={settings.galleryColumns}
               onEditVideo={(video) => {
                 setEditingVideo(video);
                 setShowVideoModal(true);
               }}
               onDeleteVideo={handleDeleteVideo}
+              onMoveVideo={handleMoveVideo}
               isAdmin={true}
               t={t}
             />

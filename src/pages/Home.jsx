@@ -56,18 +56,18 @@ export const Home = () => {
         </nav>
 
         {/* Hero section */}
-        <section className="py-16 px-4 sm:px-6 lg:px-8">
-          <div className="max-w-7xl mx-auto text-center mb-12">
-            <h2 className="text-5xl sm:text-7xl font-black mb-5 text-white">
+        <section className="pt-10 pb-4 px-4 sm:px-6 lg:px-8">
+          <div className="max-w-7xl mx-auto text-center">
+            <h2 className="text-4xl sm:text-6xl font-black mb-4 text-white">
               {t('transformations')}
             </h2>
             <p className="text-xl text-gray-300 max-w-2xl mx-auto">
               {t('videosIntro')}
             </p>
-            <p className="mt-5 text-base text-gray-400 max-w-3xl mx-auto">
+            <p className="mt-3 text-base text-gray-400 max-w-3xl mx-auto">
               {t('contactIntro')}
             </p>
-            <div className="mt-4 flex flex-col items-center gap-2 text-base">
+            <div className="mt-3 flex flex-col items-center gap-1.5 text-base">
               <a
                 href="mailto:adam_polczynski@yahoo.com"
                 className="text-white hover:text-accent transition-colors"
@@ -93,7 +93,7 @@ export const Home = () => {
         </section>
 
         {/* Videos grid */}
-        <section className="py-12 px-4 sm:px-6 lg:px-8">
+        <section className="pt-4 pb-12 px-4 sm:px-6 lg:px-8">
           <div className="max-w-7xl mx-auto">
             {loading ? (
               <div className="flex items-center justify-center py-20">
@@ -111,6 +111,7 @@ export const Home = () => {
                 videos={videos}
                 autoScroll={settings.autoScroll}
                 autoScrollInterval={settings.autoScrollInterval}
+                columns={settings.galleryColumns}
                 t={t}
               />
             )}

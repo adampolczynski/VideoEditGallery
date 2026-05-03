@@ -24,6 +24,7 @@ export const useVideosStore = create((set) => ({
   settings: {
     autoScroll: false,
     autoScrollInterval: 5000,
+    galleryColumns: 3,
   },
   loading: false,
   error: null,

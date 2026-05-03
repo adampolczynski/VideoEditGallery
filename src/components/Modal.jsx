@@ -42,6 +42,8 @@ export const VideoForm = ({
     description: '',
     before_video: '',
     after_video: '',
+    auto_scroll_mode: 'global',
+    fit_mode: 'contain',
   });
 
   const [uploadedFiles, setUploadedFiles] = useState({
@@ -53,7 +55,11 @@ export const VideoForm = ({
 
   useEffect(() => {
     if (video) {
-      setFormData(video);
+      setFormData({
+        ...video,
+        auto_scroll_mode: video.auto_scroll_mode || 'global',
+        fit_mode: video.fit_mode || 'contain',
+      });
     }
   }, [video]);
 
@@ -174,6 +180,37 @@ export const VideoForm = ({
           </label>
           {uploadedFiles.after && <p className="text-xs text-gray-400 mt-1 truncate">{uploadedFiles.after}</p>}
         </div>
+      </div>
+
+      <div>
+        <label className="block text-sm font-semibold text-white mb-2">
+          {t('videoAutoScroll')}
+        </label>
+        <select
+          name="auto_scroll_mode"
+          value={formData.auto_scroll_mode}
+          onChange={handleInputChange}
+          className="w-full px-4 py-2 bg-black border border-white/15 rounded-lg text-white focus:border-accent focus:outline-none"
+        >
+          <option value="global">{t('videoAutoScrollGlobal')}</option>
+          <option value="on">{t('videoAutoScrollOn')}</option>
+          <option value="off">{t('videoAutoScrollOff')}</option>
+        </select>
+      </div>
+
+      <div>
+        <label className="block text-sm font-semibold text-white mb-2">
+          {t('videoFitMode')}
+        </label>
+        <select
+          name="fit_mode"
+          value={formData.fit_mode}
+          onChange={handleInputChange}
+          className="w-full px-4 py-2 bg-black border border-white/15 rounded-lg text-white focus:border-accent focus:outline-none"
+        >
+          <option value="contain">{t('videoFitContain')}</option>
+          <option value="cover">{t('videoFitCover')}</option>
+        </select>
       </div>
 
       {uploadError && (
