@@ -48,7 +48,7 @@ export const Home = () => {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-lg bg-white text-black flex items-center justify-center shadow-soft">
-                <span className="font-black">VP</span>
+                <span className="font-black">AVE</span>
               </div>
               <h1 className="text-xl sm:text-2xl font-bold tracking-normal text-white">{t('brandTitle')}</h1>
             </div>
@@ -67,6 +67,28 @@ export const Home = () => {
             <p className="mt-5 text-base text-gray-400 max-w-3xl mx-auto">
               {t('contactIntro')}
             </p>
+            <div className="mt-4 flex flex-col items-center gap-2 text-base">
+              <a
+                href="mailto:adam_polczynski@yahoo.com"
+                className="text-white hover:text-accent transition-colors"
+              >
+                adam_polczynski@yahoo.com
+              </a>
+              <a
+                href="mailto:beatchemik@gmail.com"
+                className="text-white hover:text-accent transition-colors"
+              >
+                beatchemik@gmail.com
+              </a>
+              <a
+                href="https://wa.me/48786189122"
+                target="_blank"
+                rel="noreferrer"
+                className="text-white hover:text-accent transition-colors"
+              >
+                WhatsApp: +48 786 189 122
+              </a>
+            </div>
           </div>
         </section>
 
