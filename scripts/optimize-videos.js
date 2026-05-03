@@ -25,6 +25,22 @@ const options = {
 
 const videoExtensions = new Set(['.mp4', '.mov', '.m4v', '.webm', '.ogg']);
 
+const ensureFfmpeg = () => new Promise((resolve, reject) => {
+  const child = spawn('ffmpeg', ['-version'], { stdio: 'ignore' });
+
+  child.on('error', () => {
+    reject(new Error('ffmpeg is not installed or is not available in PATH. Install it on Ubuntu/Debian with: sudo apt update && sudo apt install -y ffmpeg'));
+  });
+  child.on('close', (code) => {
+    if (code === 0) {
+      resolve();
+      return;
+    }
+
+    reject(new Error('ffmpeg is installed but could not run. Check the ffmpeg installation on this server.'));
+  });
+});
+
 const pathToUploadUrl = (filePath) => {
   const relative = path.relative(uploadsDir, filePath).split(path.sep).join('/');
   return `/uploads/${relative}`;
@@ -59,6 +75,7 @@ const runFfmpeg = (inputPath, outputPath) => new Promise((resolve, reject) => {
     '-c:a', 'aac',
     '-b:a', '128k',
     '-movflags', '+faststart',
+    '-f', 'mp4',
     outputPath,
   ];
 
@@ -176,6 +193,8 @@ const optimizeOne = async (filePath) => {
 };
 
 const main = async () => {
+  await ensureFfmpeg();
+
   const videos = readVideos();
   const jsonFiles = collectFromVideosJson(videos);
   const files = jsonFiles.length > 0 ? jsonFiles : collectFromUploads();
