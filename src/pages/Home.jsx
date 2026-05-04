@@ -6,12 +6,58 @@ import { useTranslation } from '../i18n';
 
 export const Home = () => {
   const { videos, settings, loading, error, setVideos, setSettings, setLoading, setError } = useVideosStore();
-  const { t } = useTranslation();
+  const { language, t } = useTranslation();
 
   useEffect(() => {
     fetchVideos();
     fetchSettings();
   }, []);
+
+  useEffect(() => {
+    const title = t('seoTitle');
+    const description = t('seoDescription');
+    const keywords = t('seoKeywords');
+    const siteUrl = window.location.origin;
+    const canonicalUrl = `${siteUrl}/`;
+
+    document.title = title;
+    setMeta('name', 'description', description);
+    setMeta('name', 'keywords', keywords);
+    setMeta('property', 'og:title', title);
+    setMeta('property', 'og:description', description);
+    setMeta('property', 'og:url', canonicalUrl);
+    setMeta('name', 'twitter:title', title);
+    setMeta('name', 'twitter:description', description);
+    setCanonical(canonicalUrl);
+    setStructuredData({
+      '@context': 'https://schema.org',
+      '@type': 'ProfessionalService',
+      name: 'Adam Video Edits',
+      url: canonicalUrl,
+      email: ['adam_polczynski@yahoo.com', 'beatchemik@gmail.com'],
+      telephone: '+48 786 189 122',
+      areaServed: 'Worldwide',
+      description,
+      founder: {
+        '@type': 'Person',
+        name: 'Adam Polczynski',
+      },
+      serviceType: [
+        'AI video editing',
+        'Video object removal',
+        'Video object replacement',
+        'AI video inpainting',
+        'Video cleanup',
+        'Before and after transformation editing',
+        'Long-form video editing',
+      ],
+      offers: {
+        '@type': 'Offer',
+        availability: 'https://schema.org/InStock',
+        category: 'AI video editing service',
+      },
+    });
+  }, [language, t]);
 
   const fetchVideos = async () => {
     setLoading(true);
@@ -61,12 +107,22 @@ export const Home = () => {
             <h2 className="text-4xl sm:text-6xl font-black mb-4 text-white">
               {t('transformations')}
             </h2>
-            <p className="text-xl text-gray-300 max-w-2xl mx-auto">
+            <p className="text-xl text-gray-300 max-w-3xl mx-auto">
               {t('videosIntro')}
             </p>
             <p className="mt-3 text-base text-gray-400 max-w-3xl mx-auto">
               {t('contactIntro')}
             </p>
+            <div className="mt-6 flex flex-wrap items-center justify-center gap-2" aria-label={t('servicesLabel')}>
+              {t('servicePills').map((service) => (
+                <span
+                  key={service}
+                  className="rounded-full border border-white/15 bg-white/[0.06] px-3 py-1 text-sm text-gray-200"
+                >
+                  {service}
+                </span>
+              ))}
+            </div>
             <div className="mt-3 flex flex-col items-center gap-1.5 text-base">
               <a
                 href="mailto:adam_polczynski@yahoo.com"
@@ -88,6 +144,33 @@ export const Home = () => {
               >
                 WhatsApp: +48 786 189 122
               </a>
+            </div>
+          </div>
+        </section>
+
+        <section className="px-4 sm:px-6 lg:px-8 py-6">
+          <div className="max-w-7xl mx-auto grid gap-4 md:grid-cols-3">
+            {t('positioningCards').map((card) => (
+              <article key={card.title} className="surface-panel p-5">
+                <h3 className="text-lg font-bold text-white">{card.title}</h3>
+                <p className="mt-2 text-sm leading-6 text-gray-300">{card.text}</p>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        <section className="px-4 sm:px-6 lg:px-8 py-4">
+          <div className="max-w-7xl mx-auto">
+            <div className="border-y border-white/10 py-5">
+              <h2 className="text-2xl font-black text-white">{t('servicesHeading')}</h2>
+              <p className="mt-2 max-w-4xl text-gray-300 leading-7">{t('servicesCopy')}</p>
+              <div className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+                {t('searchServices').map((service) => (
+                  <div key={service} className="text-sm text-gray-200">
+                    {service}
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </section>
@@ -120,6 +203,44 @@ export const Home = () => {
       </div>
     </div>
   );
+};
+
+const setMeta = (attribute, key, content) => {
+  let element = document.head.querySelector(`meta[${attribute}="${key}"]`);
+
+  if (!element) {
+    element = document.createElement('meta');
+    element.setAttribute(attribute, key);
+    document.head.appendChild(element);
+  }
+
+  element.setAttribute('content', content);
+};
+
+const setCanonical = (href) => {
+  let element = document.head.querySelector('link[rel="canonical"]');
+
+  if (!element) {
+    element = document.createElement('link');
+    element.setAttribute('rel', 'canonical');
+    document.head.appendChild(element);
+  }
+
+  element.setAttribute('href', href);
+};
+
+const setStructuredData = (data) => {
+  const id = 'service-schema';
+  let element = document.getElementById(id);
+
+  if (!element) {
+    element = document.createElement('script');
+    element.id = id;
+    element.type = 'application/ld+json';
+    document.head.appendChild(element);
+  }
+
+  element.textContent = JSON.stringify(data);
 };
 
 export default Home;

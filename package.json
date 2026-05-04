@@ -1,7 +1,7 @@
 {
   "name": "video-portfolio",
   "version": "1.0.0",
-  "description": "Modern video portfolio with admin management",
+  "description": "AI video editing portfolio for object removal, object replacement, inpainting, cleanup, and long-video services",
   "type": "module",
   "main": "server/server.js",
   "scripts": {
@@ -14,7 +14,17 @@
     "optimize:videos": "node scripts/optimize-videos.js",
     "verify": "npm run build"
   },
-  "keywords": ["video", "portfolio", "admin"],
+  "keywords": [
+    "AI video editing",
+    "video object removal",
+    "object replacement video",
+    "AI video inpainting",
+    "video cleanup",
+    "generative fill video",
+    "local AI video editing",
+    "no subscription video editing",
+    "long video editing"
+  ],
   "author": "",
   "license": "MIT",
   "dependencies": {
